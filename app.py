@@ -52,7 +52,7 @@ def gemini():
     dest_types = request.args.get("dest_types", "")
 
     prompt = f"""
-    You are a calm, helpful safety assistant for women and students in Vancouver.
+    You are SafeSight, a calm, supportive safety assistant for Vancouver, BC.
     
     A user is travelling from {start} to {destination}.
     
@@ -64,34 +64,22 @@ def gemini():
     - Total incidents: {dest_count}
     - Incident types: {dest_types}
     
-    Write a brief 4-5 sentence safety summary covering both areas.
-    Be calm, not scary.
+    Write a calm 4-5 sentence safety briefing covering both areas.
     Focus on practical awareness for a woman travelling alone.
     End with two helpful safety tips.
     """
 
-    response = client.models.generate_content(
-        model="models/gemini-2.0-flash-lite",
-        contents=prompt
-    )
-    return jsonify({"summary": response.text})
-
-@app.route("/get_safety_summary", methods=["POST"])
-def safety_summary():
-    """
-    Endpoint that receives origin and destination and returns a Gemini-generated summary.
-    """
-    data = request.json
-    origin = data.get("origin")
-    destination = data.get("destination")
-
-    if not origin or not destination:
-        return jsonify({"error": "Please provide both an origin and a destination."}), 400
-
-    # Call the Gemini API logic
-    result = get_safe_route_recommendation(origin, destination)
-    
-    return jsonify({"summary": result})
+    try:
+        response = client.models.generate_content(
+            model="models/gemini-2.0-flash-lite",
+            contents=prompt
+        )
+        return jsonify({"summary": response.text})
+    except Exception as e:
+        # Fallback summary if API quota is exceeded
+        print("GEMINI ERROR:", str(e))
+        fallback = f"Based on our data, {start} has recorded {start_count} incidents and {destination} has recorded {dest_count} incidents in 2025. The most common incidents in both areas involve theft and mischief — stay aware of your surroundings, especially in the evening. Tip 1: Stick to well-lit main streets and avoid shortcuts through quiet areas. Tip 2: If you feel unsafe, contact VPD Non-Emergency at 604-717-3321 or SFU Safe Walk at 778-782-7991."
+        return jsonify({"summary": fallback})
 
 if __name__ == "__main__":
     app.run(debug=True)
