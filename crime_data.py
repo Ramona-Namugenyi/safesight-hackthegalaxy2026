@@ -3,27 +3,31 @@ import os
 
 def get_crime_stats_for_location(location: str) -> dict:
     """
-    Reads the local CSV file and returns data for the requested location.
+    Searches the Vancouver crime CSV for a specific neighborhood and returns a summary.
     """
-    # 1. Point to your CSV file inside the 'data' folder
-    # This dynamically gets the path so it works on any computer
     base_dir = os.path.dirname(__file__)
     csv_path = os.path.join(base_dir, 'data', 'crime_2025.csv')
     
     try:
-        # 2. Read the CSV using pandas
         df = pd.read_csv(csv_path)
+        # Standardize columns to match your CSV (TYPE, NEIGHBOURHOOD, etc.)
+        df.columns = df.columns.str.upper()
         
-        # 3. For now, we will just return some basic info so Gemini knows it worked.
-        # Once we know the exact column names in your CSV, we can filter this properly.
-        return {
-            "location_queried": location,
-            "status": "Success",
-            "total_incidents_in_database": len(df),
-            "message": "Data loaded. Need to implement filtering based on CSV columns."
+        # Search logic: find rows where the neighbourhood matches the user input
+        # Note: We use .str.contains to be flexible if a user types "Downtown" vs "Central Business District"
+        matches = df[df['NEIGHBOURHOOD'].str.contains(location, case=False, na=False)]
+        
+        if matches.empty:
+            return {"message": f"No specific crime records found for {location} in our 2025 dataset."}
+
+        # Create a helpful summary for Gemini to interpret
+        stats = {
+            "neighborhood": location,
+            "total_incidents": len(matches),
+            "common_incidents": matches['TYPE'].value_counts().head(3).to_dict(),
+            "recent_years": matches['YEAR'].unique().tolist()
         }
+        return stats
         
-    except FileNotFoundError:
-         return {"error": "Could not find the crime_2025.csv file. Check the data folder."}
     except Exception as e:
-         return {"error": f"An error occurred reading the data: {str(e)}"}
+        return {"error": f"Data access error: {str(e)}"}
