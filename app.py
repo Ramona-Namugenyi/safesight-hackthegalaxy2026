@@ -1,8 +1,11 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from dotenv import load_dotenv
 import pandas as pd
-import google.generativeai as genai
+from google import genai
 import os
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -13,8 +16,7 @@ df.columns = df.columns.str.upper()
 print("Crime data loaded:", df.shape)
 
 # Gemini setup
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY", "YOUR_KEY_HERE"))
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 @app.route("/")
 def home():
@@ -41,24 +43,36 @@ def safety():
 
 @app.route("/gemini")
 def gemini():
-    neighbourhood = request.args.get("neighbourhood", "")
-    incident_count = request.args.get("incident_count", "unknown")
-    incident_types = request.args.get("incident_types", "")
+    start = request.args.get("start", "")
+    destination = request.args.get("destination", "")
+    start_count = request.args.get("start_count", "unknown")
+    dest_count = request.args.get("dest_count", "unknown")
+    start_types = request.args.get("start_types", "")
+    dest_types = request.args.get("dest_types", "")
 
     prompt = f"""
     You are a calm, helpful safety assistant for women and students in Vancouver.
     
-    Here is recent crime data for {neighbourhood}:
-    - Total incidents: {incident_count}
-    - Incident types: {incident_types}
+    A user is travelling from {start} to {destination}.
     
-    Write a brief 3-4 sentence safety summary. 
-    Be calm, not scary. 
-    Focus on practical awareness.
-    End with one helpful tip.
+    Crime data for {start}:
+    - Total incidents: {start_count}
+    - Incident types: {start_types}
+    
+    Crime data for {destination}:
+    - Total incidents: {dest_count}
+    - Incident types: {dest_types}
+    
+    Write a brief 4-5 sentence safety summary covering both areas.
+    Be calm, not scary.
+    Focus on practical awareness for a woman travelling alone.
+    End with two helpful safety tips.
     """
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="models/gemini-2.0-flash-lite",
+        contents=prompt
+    )
     return jsonify({"summary": response.text})
 
 if __name__ == "__main__":
