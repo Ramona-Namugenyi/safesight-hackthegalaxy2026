@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeSight</title>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<body>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>SafeSight</h1>
+            <p class="tagline">Smarter safety for every step</p>
+            <p class="subtitle">Built by women, for women.</p>
+        </div>
+    </section>
+
+    <!-- SEARCH SECTION -->
+    <section class="search-section">
+        <h2>Plan your journey</h2>
+
+        <label for="start-input">📍 Your current location</label>
+        <div class="autocomplete-wrapper">
+            <input 
+                type="text" 
+                id="start-input" 
+                placeholder="e.g. Kitsilano"
+                autocomplete="off"
+            />
+            <ul class="autocomplete-list" id="start-list"></ul>
+        </div>
+
+        <label for="destination-input">📌 Your destination</label>
+        <div class="autocomplete-wrapper">
+            <input 
+                type="text" 
+                id="destination-input" 
+                placeholder="e.g. Strathcona"
+                autocomplete="off"
+            />
+            <ul class="autocomplete-list" id="dest-list"></ul>
+        </div>
+
+        <button id="check-btn">Check Safety ✨</button>
+    </section>
+
+    <!-- RESULTS SECTION -->
+    <section class="results-section" id="results">
+
+        <!-- SIDE BY SIDE SCORE CARDS -->
+        <div class="score-cards-row">
+
+            <div class="card score-card">
+                <p class="location-label">📍 From</p>
+                <h3 id="start-name"></h3>
+                <div class="score-circle" id="start-score-circle">
+                    <span id="start-score-number"></span>
+                    <small>/100</small>
+                </div>
+                <p id="start-incident-count"></p>
+            </div>
+
+            <div class="card score-card">
+                <p class="location-label">📌 To</p>
+                <h3 id="dest-name"></h3>
+                <div class="score-circle" id="dest-score-circle">
+                    <span id="dest-score-number"></span>
+                    <small>/100</small>
+                </div>
+                <p id="dest-incident-count"></p>
+            </div>
+
+        </div>
+
+        <!-- AI SUMMARY CARD -->
+        <div class="card ai-card">
+            <h3>💡 AI Safety Briefing</h3>
+            <div id="ai-summary">
+                <p class="loading">Generating your safety briefing...</p>
+            </div>
+        </div>
+
+        <!-- INCIDENT BREAKDOWN CARDS SIDE BY SIDE -->
+        <div class="score-cards-row">
+
+            <div class="card incidents-card">
+                <h3>📌 Incidents at Start</h3>
+                <ul id="start-incident-list"></ul>
+            </div>
+
+            <div class="card incidents-card">
+                <h3>📌 Incidents at Destination</h3>
+                <ul id="dest-incident-list"></ul>
+            </div>
+
+        </div>
+
+        <!-- VIEW ROUTE BUTTON -->
+        <a id="maps-btn" href="#" target="_blank" class="maps-button">
+            🗺️ Open Journey on Google Maps
+        </a>
+
+    </section>
+
+    <!-- EMERGENCY RESOURCES -->
+    <section class="emergency-section">
+        <h3>🆘 Emergency Resources</h3>
+        <div class="resources-grid">
+            <a href="tel:911" class="resource-card red">
+            <span>🆘</span>
+            <p>Call 911</p>
+            <p class="phone-number">911</p>
+        </a>
+        <a href="tel:6047173321" class="resource-card yellow">
+            <span>👮</span>
+            <p>VPD Non-Emergency</p>
+            <p class="phone-number">604-717-3321</p>
+        </a>
+        <a href="tel:7787827991" class="resource-card purple">
+            <span>🤝</span>
+            <p>SFU Safe Walk</p>
+            <p class="phone-number">778-782-7991</p>
+        </a>
+        <a href="tel:211" class="resource-card blue">
+            <span>💙</span>
+            <p>BC211 Support</p>
+            <p class="phone-number">211</p>
+        </a>
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>
