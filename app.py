@@ -5,7 +5,9 @@ import pandas as pd
 app = Flask(__name__)
 
 # Load crime data
+
 df = pd.read_csv("data/crime_2025.csv")
+print("Crime data loaded:", df.shape)
 
 df.columns = df.columns.str.upper()
 
